@@ -31,3 +31,15 @@ func (s *createTableStmt) String() string {
 	sb = append(sb, ReservedEndOfStatement)
 	return strings.Join(sb, " ")
 }
+
+func (s *createTableStmt) GetName() string {
+	return s.Name
+}
+
+func (s *createTableStmt) GetDataSources() []string {
+	var result []string
+	if s.Select != nil {
+		result = append(result, s.Select.Identifier.Name)
+	}
+	return result
+}

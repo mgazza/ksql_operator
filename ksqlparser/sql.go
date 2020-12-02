@@ -8,6 +8,8 @@ import (
 
 type Stmt interface {
 	fmt.Stringer
+	GetName() string
+	GetDataSources() []string
 }
 
 var StringOptions = struct {

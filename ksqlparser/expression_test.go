@@ -186,19 +186,19 @@ func Test_parser_parseExpression(t *testing.T) {
 				wantErr: false,
 			},
 		*/
-		// When parsing multiple item[index]+item[index]
+		// When parsing multiple stmt[index]+stmt[index]
 		{
-			name: "When parsing item[index]+item[index]",
+			name: "When parsing stmt[index]+stmt[index]",
 			fields: fields{
 				i:    0,
-				sql:  "item[index]+item[index]",
+				sql:  "stmt[index]+stmt[index]",
 				line: 0,
 				col:  0,
 			},
 			want: &operatorExpression{
 				LeftExpression: &indexExpression{
 					Expression: &basicExpression{
-						Name: "item",
+						Name: "stmt",
 					},
 					Index: &basicExpression{
 						Name: "index",
@@ -206,7 +206,7 @@ func Test_parser_parseExpression(t *testing.T) {
 				},
 				RightExpression: &indexExpression{
 					Expression: &basicExpression{
-						Name: "item",
+						Name: "stmt",
 					},
 					Index: &basicExpression{
 						Name: "index",

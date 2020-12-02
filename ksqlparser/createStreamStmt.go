@@ -31,3 +31,20 @@ func (s *createStreamStmt) String() string {
 	sb = append(sb, ReservedEndOfStatement)
 	return strings.Join(sb, " ")
 }
+
+func (s *createStreamStmt) GetName() string {
+	return s.Name
+}
+
+func (s *createStreamStmt) GetDataSources() []string {
+	var result []string
+	if s.Select != nil {
+		result = append(result, s.Select.Identifier.Name)
+		if s.Select.Joins != nil {
+			for _, j := range *s.Select.Joins {
+				result = append(result, j.Identifier.Name)
+			}
+		}
+	}
+	return result
+}
