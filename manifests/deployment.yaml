@@ -1,0 +1,18 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: connect-operator
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: connect-operator
+  template:
+    metadata:
+      labels:
+        name: connect-operator
+    spec:
+      serviceAccountName: connect-operator-service-account
+      containers:
+        - name: connect-operator
+          image: ghcr.io/mgazza/ksql_operator:latest
