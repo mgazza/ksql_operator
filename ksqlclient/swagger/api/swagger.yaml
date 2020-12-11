@@ -1,0 +1,356 @@
+openapi: 3.0.0
+info:
+  title: KSQL
+  description: This is a swagger spec for ksqldb
+  version: 1.0.0
+servers:
+- url: http://ksqldb-server:8088/
+paths:
+  /ksql:
+    post:
+      summary: Query the ksql database
+      requestBody:
+        description: The KSQL query
+        content:
+          application/vnd.ksql.v1+json:
+            schema:
+              $ref: '#/components/schemas/Statement'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/vnd.ksql.v1+json:
+              schema:
+                $ref: '#/components/schemas/KSQL_Response'
+        "400":
+          description: Bad Request
+          content:
+            application/vnd.ksql.v1+json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        "500":
+          description: Server Error
+  /status/{commandID}:
+    get:
+      summary: Query the status of a command
+      parameters:
+      - name: commandID
+        in: path
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/vnd.ksql.v1+json:
+              schema:
+                $ref: '#/components/schemas/Status_Response'
+components:
+  schemas:
+    Statement:
+      type: object
+      properties:
+        ksql:
+          type: string
+        streamsProperties:
+          $ref: '#/components/schemas/Statement_streamsProperties'
+    Error:
+      type: object
+      properties:
+        '@type':
+          type: string
+        error_code:
+          type: number
+        message:
+          type: string
+        stackTrace:
+          type: array
+          items:
+            type: string
+    DescribeResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/DescribeResultItem'
+    format:
+      type: string
+      enum:
+      - JSON
+      - AVRO
+      - PROTOBUF
+      - DELIMITED
+    ShowListResponse:
+      type: object
+      properties:
+        tables:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShowListResponse_tables'
+        streams:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShowListResponse_streams'
+        queries:
+          type: array
+          items:
+            $ref: '#/components/schemas/ShowListResponse_queries'
+        properties:
+          type: object
+    CreateDropTerminateResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/CreateDropTerminateResponse_item'
+    CreateDropTerminateResponse_item:
+      type: object
+      properties:
+        statementText:
+          type: string
+        commandId:
+          type: string
+        commandStatus:
+          $ref: '#/components/schemas/CreateDropTerminateResponse_commandStatus'
+        commandSequenceNumber:
+          type: integer
+    KSQL_Response:
+      oneOf:
+      - $ref: '#/components/schemas/DescribeResponse'
+      - $ref: '#/components/schemas/ShowListResponse'
+      - $ref: '#/components/schemas/CreateDropTerminateResponse'
+      - $ref: '#/components/schemas/ExplainResponse'
+    DescribeResultItem:
+      type: object
+      properties:
+        '@type':
+          type: string
+        statementText:
+          type: string
+        sourceDescription:
+          $ref: '#/components/schemas/DescribeResultItem_sourceDescription'
+    ShowListResponse_tables:
+      type: object
+      properties:
+        name:
+          type: string
+        topic:
+          type: string
+        format:
+          $ref: '#/components/schemas/format'
+        type:
+          type: string
+        isWindowed:
+          type: boolean
+    ShowListResponse_streams:
+      type: object
+      properties:
+        name:
+          type: string
+        topic:
+          type: string
+        format:
+          $ref: '#/components/schemas/format'
+        type:
+          type: string
+    ShowListResponse_queries:
+      type: object
+      properties:
+        queryString:
+          type: string
+        sinks:
+          type: string
+        id:
+          type: string
+    CreateDropTerminateResponse_commandStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - QUEUED
+          - PARSING
+          - EXECUTING
+          - TERMINATED
+          - SUCCESS
+          - ERROR
+        message:
+          type: string
+        queryId:
+          type: string
+    ExplainResponse:
+      type: array
+      items:
+        $ref: '#/components/schemas/ExplainResultItem'
+    ExplainResultItem:
+      type: object
+      properties:
+        '@type':
+          type: string
+        statementText:
+          type: string
+        warnings:
+          type: array
+          items:
+            type: object
+        queryDescription:
+          $ref: '#/components/schemas/ExplainResultItem_queryDescription'
+    Statement_streamsProperties:
+      type: object
+      properties:
+        ksql.streams.auto.offset.reset:
+          type: string
+          enum:
+          - latest
+          - none
+          - earliest
+    DescribeResultItem_sourceDescription_schema:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - INTEGER
+          - BIGINT
+          - BOOLEAN
+          - DOUBLE
+          - STRING
+          - MAP
+          - ARRAY
+          - STRUCT
+        memberSchema:
+          type: object
+        fields:
+          type: array
+          items:
+            type: object
+    DescribeResultItem_sourceDescription_query:
+      type: object
+      properties:
+        id:
+          type: string
+    DescribeResultItem_sourceDescription_fields:
+      type: object
+      properties:
+        name:
+          type: string
+        schema:
+          $ref: '#/components/schemas/DescribeResultItem_sourceDescription_schema'
+        type:
+          type: string
+    DescribeResultItem_sourceDescription:
+      type: object
+      properties:
+        name:
+          type: string
+        windowType:
+          type: string
+        readQueries:
+          type: array
+          items:
+            $ref: '#/components/schemas/DescribeResultItem_sourceDescription_query'
+        writeQueries:
+          type: array
+          items:
+            $ref: '#/components/schemas/DescribeResultItem_sourceDescription_query'
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/DescribeResultItem_sourceDescription_fields'
+        type:
+          type: string
+        key:
+          type: string
+        timestamp:
+          type: string
+        format:
+          $ref: '#/components/schemas/format'
+        topic:
+          type: string
+        extended:
+          type: boolean
+        statistics:
+          type: string
+        errorStats:
+          type: string
+        replication:
+          type: integer
+        partitions:
+          type: integer
+        statement:
+          type: string
+    ExplainResultItem_queryDescription_schema:
+      type: object
+      properties:
+        type:
+          type: string
+        fields:
+          type: array
+          items:
+            type: object
+        memberSchema:
+          type: object
+    ExplainResultItem_queryDescription_fields:
+      type: object
+      properties:
+        name:
+          type: string
+        type:
+          type: string
+        schema:
+          $ref: '#/components/schemas/ExplainResultItem_queryDescription_schema'
+    ExplainResultItem_queryDescription:
+      type: object
+      properties:
+        id:
+          type: string
+        statementText:
+          type: string
+        windowType:
+          type: string
+        fields:
+          type: array
+          items:
+            $ref: '#/components/schemas/ExplainResultItem_queryDescription_fields'
+        sources:
+          type: array
+          items:
+            type: string
+        sinks:
+          type: array
+          items:
+            type: string
+        topology:
+          type: string
+        executionPlan:
+          type: string
+        overriddenProperties:
+          type: object
+          additionalProperties: {}
+        ksqlHostQueryStatus:
+          type: object
+        queryType:
+          type: string
+        queryErrors:
+          type: array
+          items:
+            type: object
+        state:
+          type: string
+    Status_Response:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+          - QUEUED
+          - PARSING
+          - EXECUTING
+          - TERMINATED
+          - SUCCESS
+          - ERROR
+        message:
+          type: string
+      example:
+        message: message
+        status: QUEUED

@@ -1,0 +1,7 @@
+apiVersion: mgazza.github.com/v1alpha1
+kind: ManagedKSQL
+metadata:
+  name: example
+statement: |
+  INSERT INTO foo SELECT * FROM bar;
+
