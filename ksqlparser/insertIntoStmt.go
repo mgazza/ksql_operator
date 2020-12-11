@@ -11,6 +11,10 @@ type insertIntoStmt struct {
 	Select *streamSelect
 }
 
+func (s *insertIntoStmt) GetActionType() StmtActionType {
+	return s.Type
+}
+
 func (s *insertIntoStmt) GetName() string {
 	hasher := sha256.New()
 	hasher.Write([]byte(s.String()))

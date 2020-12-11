@@ -36,7 +36,7 @@ func min(a, b int) int {
 }
 
 func isWhitespaceRune(c rune) bool {
-	return c == ' ' || c == '\n' || c == '\r'
+	return c == ' ' || c == '\n' || c == '\r' || c == '\t'
 }
 
 func isIdentifierRune(c rune) bool {

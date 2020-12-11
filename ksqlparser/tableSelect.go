@@ -19,6 +19,10 @@ func (s *tableSelect) String() string {
 	sb = append(sb, s.Expressions.String())
 	sb = append(sb, fmt.Sprintf("%s%s", StringOptions.fromPrefix, ReservedFrom), s.Identifier.String())
 
+	if s.Window != nil {
+		sb = append(sb, fmt.Sprintf("%s%s", StringOptions.windowPrefix, ReservedWindow), s.Window.String())
+	}
+
 	if s.Where != nil {
 		sb = append(sb, fmt.Sprintf("%s%s", StringOptions.wherePrefix, ReservedWhere))
 		for _, c := range *s.Where {
@@ -41,10 +45,6 @@ func (s *tableSelect) String() string {
 		for _, c := range *s.Having {
 			sb = append(sb, c.String())
 		}
-	}
-
-	if s.Window != nil {
-		sb = append(sb, fmt.Sprintf("%s%s", StringOptions.windowPrefix, ReservedWindow), s.Window.String())
 	}
 
 	return strings.Join(sb, " ")

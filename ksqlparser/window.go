@@ -48,12 +48,20 @@ type WindowExpression struct {
 }
 
 func (e *WindowExpression) String() string {
-	sb := []string{e.Type, ReservedOpenParens, WindowFieldSize, strconv.Itoa(e.Size), e.SizeType}
-	if e.Advance > 0 {
+	sb := []string{e.Type, ReservedOpenParens}
+	if e.Type != WindowTypeSession {
+		sb = append(sb, WindowFieldSize)
+	}
+	sb = append(sb, strconv.Itoa(e.Size), e.SizeType)
+
+	if e.AdvanceType != "" {
 		sb = append(sb, ReservedComma, WindowFieldAdvanceBy, strconv.Itoa(e.Advance), e.AdvanceType)
 	}
-	if e.Retention > 0 {
+	if e.RetentionType != "" {
 		sb = append(sb, ReservedComma, WindowFieldRetention, strconv.Itoa(e.Retention), e.RetentionType)
+	}
+	if e.GracePeriodType != "" {
+		sb = append(sb, ReservedComma, WindowFieldGracePeriod, strconv.Itoa(e.GracePeriod), e.GracePeriodType)
 	}
 	sb = append(sb, ReservedCloseParens)
 	return strings.Join(sb, " ")

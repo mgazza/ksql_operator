@@ -2,22 +2,14 @@ package ksqlparser
 
 import (
 	"github.com/go-test/deep"
-	"strings"
 	"testing"
 )
 
 func Test_buildDependencyGraph(t *testing.T) {
-	samples := strings.Split(strings.TrimSpace(ksql), ";")
-	var stmts []Stmt
-	for _, sql := range samples {
-		if sql == "" {
-			continue
-		}
-		stmt, err := Parse(sql + ";")
-		if err != nil {
-			t.Error(err)
-		}
-		stmts = append(stmts, stmt)
+
+	stmts, err := Parse(ksql)
+	if err != nil {
+		t.Error(err)
 	}
 
 	want := []string{
@@ -38,16 +30,17 @@ func Test_buildDependencyGraph(t *testing.T) {
 		"SESSION_ACTIONS_V2_TB",
 	}
 
-	g, err := buildDependencyGraph(stmts)
-	if err != nil {
-		t.Error(err)
-	}
+	g := BuildDependencyGraph(stmts)
+
+	var queryResult string
 	var got []string
 	for _, i := range g {
 		got = append(got, i.GetName())
+
+		queryResult = queryResult + "\n" + i.String()
 	}
 
 	if diff := deep.Equal(got, want); diff != nil {
-		t.Errorf("buildDependencyGraph() want = %v, got %v", want, got)
+		t.Errorf("BuildDependencyGraph() want = %v, got %v", want, got)
 	}
 }

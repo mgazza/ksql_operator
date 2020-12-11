@@ -10,6 +10,11 @@ type Stmt interface {
 	fmt.Stringer
 	GetName() string
 	GetDataSources() []string
+	GetActionType() StmtActionType
+}
+
+type CreateStmt interface {
+	GetObjectType() CreateObjectType
 }
 
 var StringOptions = struct {
@@ -40,25 +45,22 @@ var StringOptions = struct {
 	windowPrefix:      "\n",
 }
 
-// Parse takes a string representing a SQL stmt and parses it into a stmt.stmt struct. It may fail.
-func Parse(sqls string) (Stmt, error) {
-	qs, err := ParseMany([]string{sqls})
-	if len(qs) == 0 {
-		return nil, err
-	}
-	return qs[0], err
-}
-
 // ParseMany takes a string slice representing many SQL queries and parses them into a stmt.stmt struct slice.
 // It may fail. If it fails, it will stop at the first failure.
-func ParseMany(sqls []string) ([]Stmt, error) {
+func Parse(sqls ...string) ([]Stmt, error) {
 	var qs []Stmt
-	for _, sql := range sqls {
-		q, err := parse(sql)
-		if err != nil {
-			return qs, err
+	for _, s := range sqls {
+		innersqls := strings.Split(strings.TrimSpace(s), ReservedEndOfStatement)
+		for i, sql := range innersqls {
+			if sql == "" {
+				continue
+			}
+			q, err := parse(sql + ReservedEndOfStatement)
+			if err != nil {
+				return qs, fmt.Errorf("error parsing query %d: %v", i, err)
+			}
+			qs = append(qs, q)
 		}
-		qs = append(qs, q)
 	}
 	return qs, nil
 }
@@ -100,7 +102,7 @@ func (p *parser) doParse() (Stmt, error) {
 			}
 			stmt := &createTableStmt{
 				stmt: stmt{
-					Type: item,
+					Type: StmtActionType(item),
 					Name: n,
 				},
 			}
@@ -167,7 +169,7 @@ func (p *parser) doParse() (Stmt, error) {
 			}
 			stmt := &createStreamStmt{
 				stmt: stmt{
-					Type: item,
+					Type: StmtActionType(item),
 					Name: n,
 				},
 			}
@@ -238,7 +240,7 @@ func (p *parser) doParse() (Stmt, error) {
 		}
 		stmt := &insertIntoStmt{
 			stmt: stmt{
-				Type: item,
+				Type: StmtActionType(item),
 				Name: n,
 			},
 		}

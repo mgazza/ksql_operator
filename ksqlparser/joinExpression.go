@@ -8,7 +8,7 @@ type joinExpression struct {
 }
 
 func (e *joinExpression) String() string {
-	sb := []string{ReservedLeftJoin, e.Identifier.String()}
+	sb := []string{ReservedLeftJoin, e.Identifier.String(), ReservedOn}
 	for _, c := range e.Conditions {
 		sb = append(sb, c.String())
 	}

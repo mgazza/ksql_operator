@@ -18,7 +18,7 @@ func (a dependencyGraph) Len() int           { return len(a) }
 func (a dependencyGraph) Less(i, j int) bool { return a[i].name < a[j].name }
 func (a dependencyGraph) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
-func buildDependencyGraph(stmts []Stmt) ([]Stmt, error) {
+func BuildDependencyGraph(stmts []Stmt) []Stmt {
 	stmtMap := map[string]graphitem{}
 	for _, item := range stmts {
 		n := strings.ToUpper(item.GetName())
@@ -61,5 +61,5 @@ func buildDependencyGraph(stmts []Stmt) ([]Stmt, error) {
 			i = -1
 		}
 	}
-	return order, nil
+	return order
 }

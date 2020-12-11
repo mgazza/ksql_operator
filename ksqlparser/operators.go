@@ -31,5 +31,8 @@ type Condition struct {
 func (c Condition) String() string {
 	var sb []string
 	sb = append(sb, c.Operand1.String(), string(c.Operator), c.Operand2.String())
+	if c.Conjunction != "" {
+		sb = append(sb, c.Conjunction)
+	}
 	return strings.Join(sb, " ")
 }

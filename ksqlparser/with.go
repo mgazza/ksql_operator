@@ -43,8 +43,10 @@ func (w *with) String() string {
 	var sb []string
 
 	sb = append(sb, fmt.Sprintf("%s %s %s", WithPropertyKafkaTopic, ReservedEq, w.KafkaTopic))
-	sb = append(sb, fmt.Sprintf("%s%s %s %s", ReservedComma, WithPropertyValueFormat, ReservedEq, w.ValueFormat))
 
+	if string(w.ValueFormat) != "" {
+		sb = append(sb, fmt.Sprintf("%s%s %s %s", ReservedComma, WithPropertyValueFormat, ReservedEq, w.ValueFormat))
+	}
 	if w.Key != "" {
 		sb = append(sb, fmt.Sprintf("%s%s %s %s", ReservedComma, WithPropertyKey, ReservedEq, w.Key))
 	}

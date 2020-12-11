@@ -13,8 +13,16 @@ type createTableStmt struct {
 	EmitChanges bool
 }
 
+func (s *createTableStmt) GetObjectType() CreateObjectType {
+	return CreateObjectTypeTable
+}
+
+func (s *createTableStmt) GetActionType() StmtActionType {
+	return s.Type
+}
+
 func (s *createTableStmt) String() string {
-	sb := []string{s.stmt.Type, ReservedTable, s.Name}
+	sb := []string{string(s.stmt.Type), ReservedTable, s.Name}
 
 	if s.Columns != nil {
 		sb = append(sb, s.Columns.String())

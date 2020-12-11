@@ -100,16 +100,10 @@ CREATE OR REPLACE TABLE HC_1MINUTE_TB
     WINDOW HOPPING (SIZE 1 minute, ADVANCE BY 30 SECONDS, RETENTION 2 MINUTES, GRACE PERIOD 0 SECONDS)
   GROUP BY journey_code;
 
- CREATE OR REPLACE STREAM ATTRIBUTIONS_ST (
-  journey_code string,
-  session_id string,
-  order_value double,
-  order_currency string,
-  scenario_id string,
-    location string,
-    device string
-  )
- WITH (KAFKA_TOPIC='DA_ATTRIBUTIONS_TB', VALUE_FORMAT='JSON', PARTITIONS=1, REPLICAS=1);
+ CREATE OR REPLACE STREAM ATTRIBUTIONS_ST
+ WITH (KAFKA_TOPIC='DA_ATTRIBUTIONS_TB', VALUE_FORMAT='JSON', PARTITIONS=1, REPLICAS=1)
+AS 
+SELECT * FROM PROMOCODE_ATTRIBUTIONS_ST EMIT CHANGES;
 
 CREATE OR REPLACE STREAM PROMOCODE_ATTRIBUTIONS_ST (
   journey_code string,
@@ -180,9 +174,6 @@ CREATE OR REPLACE TABLE PROMOCODE_ATTRIBUTIONS_TB
         promo_codes[attribution_actions['purchase']] IS NOT NULL
     GROUP BY journey_code, session_id, attribution_actions['purchase'], location, device
     HAVING COUNT(session_id + attribution_actions['purchase']) = 1;
-
-
-INSERT INTO ATTRIBUTIONS_ST SELECT * FROM PROMOCODE_ATTRIBUTIONS_ST;
 
 CREATE OR REPLACE TABLE ATTRIBUTIONS_CONFIG_TB (
     journey_code string PRIMARY KEY,
@@ -259,7 +250,7 @@ func TestParseWithSamples(t *testing.T) {
 			if err != nil {
 				tt.Error(err)
 			}
-			tt.Log(q.String())
+			tt.Log(q[0].String())
 		})
 	}
 }

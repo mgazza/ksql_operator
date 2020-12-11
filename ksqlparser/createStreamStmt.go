@@ -13,8 +13,16 @@ type createStreamStmt struct {
 	EmitChanges bool
 }
 
+func (s *createStreamStmt) GetObjectType() CreateObjectType {
+	return CreateObjectTypeStream
+}
+
+func (s *createStreamStmt) GetActionType() StmtActionType {
+	return s.Type
+}
+
 func (s *createStreamStmt) String() string {
-	sb := []string{s.stmt.Type, ReservedStream, s.Name}
+	sb := []string{string(s.stmt.Type), ReservedStream, s.Name}
 
 	if s.Columns != nil {
 		sb = append(sb, s.Columns.String())
